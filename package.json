@@ -1,0 +1,12 @@
+{
+  "name": "lumiere-cafe",
+  "version": "1.0.0",
+  "description": "Lumière — Animated artisan cafe static website in Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["cafe", "nodejs", "static", "animated"],
+  "author": "",
+  "license": "MIT"
+}
