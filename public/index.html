@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lumière Cafe — Crafted with Passion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ─── RESET & VARIABLES ─── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:       #080602;
+      --bg2:      #100e08;
+      --gold:     #c8a97e;
+      --gold2:    #e8cc9a;
+      --cream:    #f5ead6;
+      --rust:     #8b3a1a;
+      --espresso: #1a0e05;
+      --smoke:    rgba(200,169,126,0.08);
+      --glow:     rgba(200,169,126,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--cream);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── CUSTOM CURSOR ─── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      width: 40px; height: 40px;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.18s ease;
+      opacity: 0.6;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* ─── LOADING SCREEN ─── */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--espresso);
+      z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      animation: loaderOut 0.7s 2.4s ease forwards;
+    }
+    @keyframes loaderOut { to { opacity: 0; pointer-events: none; visibility: hidden; } }
+
+    .loader-cup {
+      font-size: 3.5rem;
+      animation: floatCup 1s ease-in-out infinite alternate;
+    }
+    @keyframes floatCup {
+      from { transform: translateY(0) rotate(-5deg); }
+      to   { transform: translateY(-12px) rotate(5deg); }
+    }
+    .loader-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin-top: 20px;
+      letter-spacing: 6px;
+      animation: fadeInUp 0.8s 0.3s ease both;
+    }
+    .loader-bar {
+      width: 180px; height: 2px;
+      background: rgba(200,169,126,0.2);
+      margin-top: 24px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loader-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      animation: barFill 2s ease forwards;
+    }
+    @keyframes barFill { from { width: 0; } to { width: 100%; } }
+
+    /* ─── PARTICLE CANVAS ─── */
+    #particleCanvas {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 60px;
+      transition: all 0.4s ease;
+    }
+    nav.scrolled {
+      background: rgba(8,6,2,0.92);
+      backdrop-filter: blur(20px);
+      padding: 14px 60px;
+      border-bottom: 1px solid rgba(200,169,126,0.12);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+    .nav-logo span { font-style: italic; color: var(--cream); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: rgba(245,234,214,0.65);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-reserve {
+      border: 1px solid var(--gold);
+      color: var(--gold) !important;
+      padding: 8px 22px;
+      border-radius: 2px;
+      transition: all 0.3s !important;
+    }
+    .nav-reserve:hover {
+      background: var(--gold) !important;
+      color: var(--bg) !important;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Animated gradient background */
+    .hero-bg {
+      position: absolute; inset: -50%;
+      background: 
+        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(139,58,26,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 30%, rgba(200,169,126,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(139,58,26,0.15) 0%, transparent 50%);
+      animation: bgShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift {
+      0%   { transform: translate(0,0) scale(1); }
+      33%  { transform: translate(2%, 1%) scale(1.05); }
+      66%  { transform: translate(-1%, 2%) scale(0.98); }
+      100% { transform: translate(1%, -1%) scale(1.03); }
+    }
+
+    /* Steam lines */
+    .steam-container {
+      position: absolute;
+      bottom: 35%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 16px;
+    }
+    .steam {
+      width: 3px;
+      height: 60px;
+      background: linear-gradient(to top, transparent, rgba(200,169,126,0.4), transparent);
+      border-radius: 50px;
+      animation: steamRise 3s ease-in-out infinite;
+      filter: blur(2px);
+    }
+    .steam:nth-child(2) { animation-delay: 0.8s; height: 80px; }
+    .steam:nth-child(3) { animation-delay: 1.6s; }
+    @keyframes steamRise {
+      0%   { transform: translateY(0) scaleX(1); opacity: 0; }
+      30%  { opacity: 1; }
+      100% { transform: translateY(-80px) scaleX(2); opacity: 0; }
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeInUp 0.9s 2.6s ease forwards;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(4rem, 10vw, 8rem);
+      line-height: 0.95;
+      letter-spacing: -2px;
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeInUp 1s 2.8s ease forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+      display: block;
+    }
+
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 300;
+      color: rgba(245,234,214,0.6);
+      max-width: 420px;
+      line-height: 1.8;
+      margin-top: 28px;
+      opacity: 0;
+      animation: fadeInUp 1s 3.1s ease forwards;
+    }
+
+    .hero-cta-group {
+      display: flex; gap: 20px; margin-top: 50px;
+      opacity: 0;
+      animation: fadeInUp 1s 3.3s ease forwards;
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--bg);
+      padding: 16px 40px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: none;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .btn-gold::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--gold2);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+    }
+    .btn-gold:hover::before { transform: translateX(0); }
+    .btn-gold span { position: relative; z-index: 1; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--cream);
+      padding: 16px 40px;
+      border: 1px solid rgba(245,234,214,0.3);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: none;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      opacity: 0;
+      animation: fadeInUp 1s 3.8s ease forwards;
+    }
+    .hero-scroll span {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(200,169,126,0.5);
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── MARQUEE ─── */
+    .marquee-wrap {
+      position: relative; z-index: 2;
+      background: var(--gold);
+      padding: 14px 0;
+      overflow: hidden;
+    }
+    .marquee-track {
+      display: flex; gap: 60px;
+      animation: marquee 20s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-item {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      color: var(--espresso);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .marquee-dot { width: 5px; height: 5px; background: var(--espresso); border-radius: 50%; }
+
+    /* ─── SECTION BASE ─── */
+    .section { padding: 120px 60px; position: relative; z-index: 2; }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1.1;
+      color: var(--cream);
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    /* ─── ABOUT / STORY ─── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-circle {
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, rgba(139,58,26,0.6), rgba(8,6,2,0.9));
+      border: 1px solid rgba(200,169,126,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8rem;
+      position: relative;
+      animation: rotateSlow 20s linear infinite;
+    }
+    @keyframes rotateSlow {
+      from { box-shadow: 0 0 60px rgba(200,169,126,0.1); }
+      50%  { box-shadow: 0 0 100px rgba(200,169,126,0.2); }
+      to   { box-shadow: 0 0 60px rgba(200,169,126,0.1); }
+    }
+    .about-circle::before {
+      content: '';
+      position: absolute; inset: -20px;
+      border-radius: 50%;
+      border: 1px dashed rgba(200,169,126,0.2);
+      animation: spinSlow 30s linear infinite;
+    }
+    @keyframes spinSlow { to { transform: rotate(360deg); } }
+    .about-circle::after {
+      content: '';
+      position: absolute; inset: -40px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,169,126,0.08);
+    }
+    .about-stat-pill {
+      position: absolute;
+      background: var(--espresso);
+      border: 1px solid rgba(200,169,126,0.3);
+      padding: 12px 20px;
+      border-radius: 100px;
+    }
+    .about-stat-pill h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+    }
+    .about-stat-pill p { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,234,214,0.5); margin-top: 2px; }
+    .pill-1 { top: 10%; right: -10%; }
+    .pill-2 { bottom: 15%; left: -8%; }
+
+    .about-text .section-title { margin-bottom: 28px; }
+    .about-text p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: rgba(245,234,214,0.65);
+      line-height: 1.9;
+      margin-bottom: 18px;
+    }
+    .gold-line {
+      width: 60px; height: 2px;
+      background: var(--gold);
+      margin: 32px 0;
+    }
+
+    /* ─── MENU ─── */
+    .menu-section {
+      background: var(--bg2);
+      border-top: 1px solid rgba(200,169,126,0.1);
+      border-bottom: 1px solid rgba(200,169,126,0.1);
+    }
+    .menu-inner { max-width: 1200px; margin: 0 auto; }
+    .menu-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 60px;
+    }
+    .menu-cats {
+      display: flex; gap: 6px;
+    }
+    .cat-btn {
+      background: transparent;
+      border: 1px solid rgba(200,169,126,0.25);
+      color: rgba(245,234,214,0.5);
+      padding: 8px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: none;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    .cat-btn.active, .cat-btn:hover {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--bg);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .menu-item {
+      background: rgba(200,169,126,0.03);
+      border: 1px solid rgba(200,169,126,0.08);
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      display: none;
+    }
+    .menu-item.visible { display: block; animation: itemReveal 0.5s ease forwards; }
+    @keyframes itemReveal {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .menu-item::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(200,169,126,0.08), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .menu-item:hover::before { opacity: 1; }
+    .menu-item:hover { border-color: rgba(200,169,126,0.3); transform: translateY(-4px); }
+
+    .item-emoji { font-size: 2.4rem; margin-bottom: 18px; display: block; }
+    .item-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--cream);
+      margin-bottom: 10px;
+    }
+    .item-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: rgba(245,234,214,0.5);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .item-footer { display: flex; justify-content: space-between; align-items: center; }
+    .item-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+    .item-tag {
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border: 1px solid rgba(200,169,126,0.3);
+      color: var(--gold);
+      border-radius: 2px;
+    }
+    .item-tag.signature { background: rgba(200,169,126,0.1); }
+
+    /* ─── SPECIALTY / FEATURE ROW ─── */
+    .feature-section { max-width: 1200px; margin: 0 auto; }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      margin-top: 70px;
+    }
+    .feature-card {
+      text-align: center;
+      padding: 50px 30px;
+      border: 1px solid rgba(200,169,126,0.1);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+    .feature-card:hover::after { transform: scaleX(1); }
+    .feature-card:hover { background: var(--smoke); }
+    .feature-icon { font-size: 3rem; margin-bottom: 24px; display: block; }
+    .feature-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--cream);
+      margin-bottom: 14px;
+    }
+    .feature-card p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      color: rgba(245,234,214,0.5);
+      line-height: 1.7;
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    .testimonial-section {
+      background: var(--espresso);
+      border-top: 1px solid rgba(200,169,126,0.15);
+    }
+    .testimonial-inner { max-width: 1000px; margin: 0 auto; text-align: center; }
+    .testimonial-track { position: relative; min-height: 280px; margin-top: 60px; }
+    .testimonial-slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .testimonial-slide.active { opacity: 1; }
+    .testimonial-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1.7;
+      max-width: 700px;
+      margin-bottom: 36px;
+    }
+    .testimonial-quote::before { content: '\201C'; color: var(--gold); font-size: 2em; line-height: 0; vertical-align: -0.4em; margin-right: 4px; }
+    .testimonial-author { color: var(--gold); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; }
+    .testimonial-location { color: rgba(245,234,214,0.35); font-size: 0.75rem; letter-spacing: 2px; margin-top: 6px; }
+    .test-dots { display: flex; gap: 10px; justify-content: center; margin-top: 50px; }
+    .test-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(200,169,126,0.3);
+      cursor: none;
+      transition: all 0.3s;
+    }
+    .test-dot.active { background: var(--gold); transform: scale(1.4); }
+
+    /* ─── RESERVATION ─── */
+    .reservation-section { max-width: 800px; margin: 0 auto; }
+    .res-form {
+      margin-top: 60px;
+      border: 1px solid rgba(200,169,126,0.15);
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .res-form::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+    .form-group { display: flex; flex-direction: column; gap: 10px; }
+    .form-group label {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: rgba(200,169,126,0.05);
+      border: 1px solid rgba(200,169,126,0.15);
+      color: var(--cream);
+      padding: 14px 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.3s;
+      border-radius: 2px;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--gold); }
+    .form-group input::placeholder { color: rgba(245,234,214,0.25); }
+    .form-group textarea { resize: none; height: 100px; }
+    .form-group select option { background: var(--espresso); }
+    .btn-submit {
+      width: 100%;
+      margin-top: 10px;
+      padding: 18px;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .btn-submit:hover { background: var(--gold2); }
+    .success-toast {
+      display: none;
+      background: rgba(200,169,126,0.1);
+      border: 1px solid rgba(200,169,126,0.3);
+      color: var(--gold);
+      text-align: center;
+      padding: 18px;
+      margin-top: 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--espresso);
+      border-top: 1px solid rgba(200,169,126,0.15);
+      padding: 70px 60px 40px;
+      position: relative; z-index: 2;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 50px;
+      max-width: 1200px;
+      margin: 0 auto 50px;
+    }
+    .footer-brand .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+      display: block;
+      margin-bottom: 16px;
+    }
+    .footer-brand p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: rgba(245,234,214,0.4);
+      line-height: 1.7;
+      max-width: 250px;
+    }
+    .footer-col h4 {
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: rgba(245,234,214,0.45);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-col ul a:hover { color: var(--gold); }
+    .footer-col ul li { color: rgba(245,234,214,0.45); font-family: 'Cormorant Garamond', serif; font-size: 1rem; }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      border-top: 1px solid rgba(200,169,126,0.1);
+      padding-top: 28px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-bottom p { font-size: 0.78rem; color: rgba(245,234,214,0.25); letter-spacing: 1px; }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.revealed { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── FLOATING ORBS ─── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat 15s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(139,58,26,0.15), transparent 70%);
+      top: 10%; left: -10%;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(200,169,126,0.08), transparent 70%);
+      top: 60%; right: -5%;
+      animation-delay: -7s;
+    }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(3%, 5%); }
+      66% { transform: translate(-2%, 3%); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .about-grid  { grid-template-columns: 1fr; }
+      .menu-grid   { grid-template-columns: 1fr 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .footer-grid  { grid-template-columns: 1fr 1fr; }
+      nav { padding: 18px 24px; }
+      nav.scrolled { padding: 12px 24px; }
+      .section { padding: 80px 24px; }
+      .about-circle { width: 280px; height: 280px; font-size: 5rem; }
+    }
+    @media (max-width: 600px) {
+      .menu-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero-title { letter-spacing: -1px; }
+      .res-form { padding: 30px 20px; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-cup">☕</div>
+  <div class="loader-text">LUMIÈRE</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- AMBIENT ORBS -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Lumière <span>Cafe</span></a>
+  <ul class="nav-links">
+    <li><a href="#story">Story</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#reserve" class="nav-reserve">Reserve</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="steam-container">
+    <div class="steam"></div>
+    <div class="steam"></div>
+    <div class="steam"></div>
+  </div>
+  <div class="hero-eyebrow">Est. 2009 · Artisan Coffee & Cuisine · Pune</div>
+  <h1 class="hero-title">
+    Where Every Sip
+    <em>Becomes a Memory</em>
+  </h1>
+  <p class="hero-sub">Handcrafted brews. Slow mornings. An atmosphere crafted to make you linger longer.</p>
+  <div class="hero-cta-group">
+    <a href="#menu" class="btn-gold"><span>Explore Menu</span></a>
+    <a href="#reserve" class="btn-ghost">Reserve a Table</a>
+  </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Artisan Coffee <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Handcrafted Pastries <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Single Origin Beans <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Live Jazz Evenings <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Seasonal Menu <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Free WiFi <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Artisan Coffee <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Handcrafted Pastries <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Single Origin Beans <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Live Jazz Evenings <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Seasonal Menu <span class="marquee-dot"></span></div>
+    <div class="marquee-item">Free WiFi <span class="marquee-dot"></span></div>
+  </div>
+</div>
+
+<!-- STORY -->
+<section class="section" id="story">
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="about-circle">☕</div>
+      <div class="about-stat-pill pill-1">
+        <h4>15+</h4><p>Years Brewing</p>
+      </div>
+      <div class="about-stat-pill pill-2">
+        <h4>4.9★</h4><p>Google Rating</p>
+      </div>
+    </div>
+    <div class="about-text">
+      <p class="section-label reveal">Our Story</p>
+      <h2 class="section-title reveal reveal-delay-1">Born from a <em>Love of Coffee</em></h2>
+      <div class="gold-line reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2">Lumière began in 2009 when founder Aryan Mehta returned from three years training under master roasters in Milan and Vienna. He had one vision: bring true European cafe culture to Pune.</p>
+      <p class="reveal reveal-delay-3">Every bean we source tells a story. Every cup we pull is a ritual. Every table you sit at is a stage for connection, creativity, and quiet contemplation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="section menu-section" id="menu">
+  <div class="menu-inner">
+    <div class="menu-header">
+      <div>
+        <p class="section-label reveal">Our Menu</p>
+        <h2 class="section-title reveal reveal-delay-1">Crafted with <em>Intention</em></h2>
+      </div>
+      <div class="menu-cats reveal">
+        <button class="cat-btn active" onclick="filterMenu('all', this)">All</button>
+        <button class="cat-btn" onclick="filterMenu('coffee', this)">Coffee</button>
+        <button class="cat-btn" onclick="filterMenu('food', this)">Food</button>
+        <button class="cat-btn" onclick="filterMenu('dessert', this)">Dessert</button>
+      </div>
+    </div>
+    <div class="menu-grid" id="menuGrid">
+      <!-- Items injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section" id="experience">
+  <div class="feature-section">
+    <div style="text-align:center;">
+      <p class="section-label reveal">The Experience</p>
+      <h2 class="section-title reveal reveal-delay-1">More Than <em>Just Coffee</em></h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card reveal">
+        <span class="feature-icon">🫘</span>
+        <h3>Single Origin Beans</h3>
+        <p>We work directly with farms in Ethiopia, Colombia & Coorg. Every bag is traceable, fresh-roasted and full of character.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <span class="feature-icon">🎵</span>
+        <h3>Live Jazz Fridays</h3>
+        <p>Every Friday evening, local musicians take the floor. Great coffee. Soft lights. Soulful music. Your perfect Friday night.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <span class="feature-icon">📖</span>
+        <h3>The Reading Corner</h3>
+        <p>A curated library of 400+ books, free to borrow. Because the best companion to a great cup is a great story.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonial-section">
+  <div class="testimonial-inner">
+    <p class="section-label">Guests Say</p>
+    <h2 class="section-title"><em>Loved</em> by Thousands</h2>
+    <div class="testimonial-track">
+      <div class="testimonial-slide active">
+        <p class="testimonial-quote">Lumière doesn't just serve coffee — it serves an entire feeling. I come here every morning and it's never once felt routine.</p>
+        <div class="testimonial-author">Priya Rao</div>
+        <div class="testimonial-location">Koregaon Park, Pune</div>
+      </div>
+      <div class="testimonial-slide">
+        <p class="testimonial-quote">The truffle mushroom toast paired with their Ethiopian pour-over was one of the best food experiences I've had this year, anywhere.</p>
+        <div class="testimonial-author">Nikhil Sharma</div>
+        <div class="testimonial-location">Baner, Pune</div>
+      </div>
+      <div class="testimonial-slide">
+        <p class="testimonial-quote">I proposed to my partner here. The ambiance is unreal — candles, jazz, perfect coffee. They said yes. Lumière is forever special to us.</p>
+        <div class="testimonial-author">Arjun & Meera Kapoor</div>
+        <div class="testimonial-location">Aundh, Pune</div>
+      </div>
+    </div>
+    <div class="test-dots">
+      <div class="test-dot active" onclick="goTestimonial(0)"></div>
+      <div class="test-dot" onclick="goTestimonial(1)"></div>
+      <div class="test-dot" onclick="goTestimonial(2)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVATION -->
+<section class="section" id="reserve">
+  <div class="reservation-section">
+    <div style="text-align:center;">
+      <p class="section-label reveal">Reservations</p>
+      <h2 class="section-title reveal reveal-delay-1">Secure Your <em>Table</em></h2>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:rgba(245,234,214,0.5);margin-top:14px;" class="reveal reveal-delay-2">
+        We recommend booking 48 hours ahead, especially for evenings & weekends.
+      </p>
+    </div>
+    <div class="res-form reveal">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="rName" placeholder="Your name"/>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="rPhone" placeholder="+91 00000 00000"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="rDate"/>
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <input type="time" id="rTime"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Guests</label>
+          <select id="rGuests">
+            <option>1–2 Guests</option>
+            <option>3–4 Guests</option>
+            <option>5–6 Guests</option>
+            <option>Private Dining (8+)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Occasion</label>
+          <select id="rOccasion">
+            <option>Casual Visit</option>
+            <option>Date Night</option>
+            <option>Birthday</option>
+            <option>Anniversary</option>
+            <option>Business Lunch</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:24px;">
+        <label>Special Requests</label>
+        <textarea id="rReq" placeholder="Dietary needs, seating preferences, surprises..."></textarea>
+      </div>
+      <button class="btn-submit" onclick="submitRes()">Confirm Reservation</button>
+      <div class="success-toast" id="successToast">
+        ✨ Your table is reserved. We'll send a confirmation to your phone. See you soon.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo">Lumière</span>
+      <p>An artisan cafe crafted for those who believe the best moments deserve the best coffee.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#story">Our Story</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#reserve">Reserve</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Hours</h4>
+      <ul>
+        <li>Mon–Fri: 7am – 10pm</li>
+        <li>Saturday: 8am – 11pm</li>
+        <li>Sunday: 9am – 9pm</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Find Us</h4>
+      <ul>
+        <li>12 Boat Club Road</li>
+        <li>Pune, Maharashtra</li>
+        <li><a href="#">+91 98765 00000</a></li>
+        <li><a href="#">hello@lumiere.cafe</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Lumière Cafe. All rights reserved.</p>
+    <p>Made with ☕ in Pune</p>
+  </div>
+</footer>
+
+<!-- ────────────── JAVASCRIPT ────────────── -->
+<script>
+/* ── CURSOR ── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+});
+
+function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button, .test-dot, .cat-btn').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width  = '20px';
+    cursor.style.height = '20px';
+    ring.style.width    = '60px';
+    ring.style.height   = '60px';
+    ring.style.borderColor = 'rgba(200,169,126,0.8)';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width  = '12px';
+    cursor.style.height = '12px';
+    ring.style.width    = '40px';
+    ring.style.height   = '40px';
+    ring.style.borderColor = 'rgba(200,169,126,0.6)';
+  });
+});
+
+/* ── PARTICLES ── */
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = -Math.random() * 0.5 - 0.2;
+    this.opacity = Math.random() * 0.4 + 0.1;
+    this.life = 0;
+    this.maxLife = Math.random() * 200 + 100;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.life++;
+    if (this.life > this.maxLife || this.y < -10) this.reset();
+  }
+  draw() {
+    const alpha = this.opacity * Math.sin((this.life / this.maxLife) * Math.PI);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,169,126,${alpha})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+function animParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ── SCROLL REVEAL ── */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
+}, { threshold: 0.15 });
+reveals.forEach(r => observer.observe(r));
+
+/* ── MENU DATA ── */
+const menuItems = [
+  { cat: 'coffee', emoji: '☕', name: 'Signature Espresso', desc: 'Double-shot pulled to perfection. Ethiopian Yirgacheffe beans, bright and citrusy.', price: '₹180', tag: 'Signature' },
+  { cat: 'coffee', emoji: '🥛', name: 'Oat Milk Latte',    desc: 'Silky steamed oat milk layered over a bold ristretto shot. Vegan-friendly.', price: '₹220', tag: 'Vegan' },
+  { cat: 'coffee', emoji: '🧊', name: 'Cold Brew Tonic',   desc: '18-hour cold-steeped brew poured over tonic water with a zest of orange peel.', price: '₹260', tag: 'Seasonal' },
+  { cat: 'coffee', emoji: '🍵', name: 'Matcha Cortado',    desc: 'Ceremonial-grade matcha meets our house espresso. A harmonious east-west blend.', price: '₹280', tag: 'Signature' },
+  { cat: 'food',   emoji: '🥑', name: 'Truffle Avocado Toast', desc: 'Sourdough, whipped truffle ricotta, microgreens and a poached egg.', price: '₹380', tag: 'Chef\'s Pick' },
+  { cat: 'food',   emoji: '🧇', name: 'Brioche French Toast', desc: 'Thick-cut brioche soaked in vanilla custard, caramelised and served with fruit compote.', price: '₹340', tag: '' },
+  { cat: 'food',   emoji: '🥙', name: 'Mediterranean Wrap', desc: 'Grilled halloumi, roasted peppers, olive tapenade in a warm spinach wrap.', price: '₹320', tag: 'Veg' },
+  { cat: 'food',   emoji: '🍳', name: 'Shakshuka', desc: 'Eggs poached in a spiced tomato harissa sauce, served with sourdough soldiers.', price: '₹360', tag: '' },
+  { cat: 'dessert', emoji: '🍮', name: 'Espresso Crème Brûlée', desc: 'Classic crème brûlée infused with our house espresso. Torch-caramelised at the table.', price: '₹290', tag: 'Signature' },
+  { cat: 'dessert', emoji: '🍫', name: 'Dark Chocolate Fondant', desc: '72% Callebaut chocolate lava cake with salted caramel ice cream.', price: '₹310', tag: 'Chef\'s Pick' },
+  { cat: 'dessert', emoji: '🍰', name: 'Basque Burnt Cheesecake', desc: 'Rustic Basque-style cheesecake — caramelised top, silky custard centre.', price: '₹270', tag: '' },
+  { cat: 'dessert', emoji: '🧁', name: 'Earl Grey Choux',  desc: 'Choux pastry filled with earl grey cream and topped with lavender glaze.', price: '₹230', tag: 'Seasonal' },
+];
+
+function renderMenu(filter) {
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = '';
+  const filtered = filter === 'all' ? menuItems : menuItems.filter(i => i.cat === filter);
+  filtered.forEach((item, i) => {
+    const d = document.createElement('div');
+    d.className = 'menu-item visible';
+    d.style.animationDelay = (i * 0.07) + 's';
+    d.innerHTML = `
+      <span class="item-emoji">${item.emoji}</span>
+      <div class="item-name">${item.name}</div>
+      <div class="item-desc">${item.desc}</div>
+      <div class="item-footer">
+        <span class="item-price">${item.price}</span>
+        ${item.tag ? `<span class="item-tag ${item.tag === 'Signature' || item.tag === "Chef's Pick" ? 'signature' : ''}">${item.tag}</span>` : ''}
+      </div>`;
+    grid.appendChild(d);
+  });
+}
+renderMenu('all');
+
+function filterMenu(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMenu(cat);
+}
+
+/* ── TESTIMONIALS ── */
+let testIdx = 0;
+const slides = document.querySelectorAll('.testimonial-slide');
+const dots   = document.querySelectorAll('.test-dot');
+
+function goTestimonial(i) {
+  slides[testIdx].classList.remove('active');
+  dots[testIdx].classList.remove('active');
+  testIdx = i;
+  slides[testIdx].classList.add('active');
+  dots[testIdx].classList.add('active');
+}
+
+setInterval(() => {
+  goTestimonial((testIdx + 1) % slides.length);
+}, 5000);
+
+/* ── RESERVATION ── */
+document.getElementById('rDate').min = new Date().toISOString().split('T')[0];
+
+function submitRes() {
+  const n = document.getElementById('rName').value.trim();
+  const p = document.getElementById('rPhone').value.trim();
+  const d = document.getElementById('rDate').value;
+  const t = document.getElementById('rTime').value;
+  if (!n || !p || !d || !t) {
+    alert('Please fill in your name, phone, date and time.');
+    return;
+  }
+  const toast = document.getElementById('successToast');
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 6000);
+}
+</script>
+</body>
+</html>
