@@ -40,5 +40,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n  ✨ Lumière Cafe is live!\n`);
-  console.log(`  → http://98.89.27.247:${3000}\n`);
+  console.log(`  → http://localhost:${port}\n`);
 });
